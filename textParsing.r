@@ -24,6 +24,14 @@ for (u in users)
   # get only data relevant to the current user
   userData <- data[data$user == u,]
   
+  # Number of logins and number of successful logins start at 0
+  numLogins = 0
+  numSuccess = 0
+  
+  # List of login times
+  loginTimeSuccess = c()
+  loginTimeFail = c()
+  
   # get a list of unique sites
   sites = unique(userData$site)
   
@@ -33,29 +41,76 @@ for (u in users)
     # get data relevant to the current site
     siteData <- userData[userData$site == s,]
     
-    # Naive way to calculate sums of the logins, does not take into account user entering the password
-    # and then not hitting the login button
-    numLogin = sum(apply(siteData, 1, function(x) x["mode"] == "login"))
-    numSuccess = sum(apply(siteData, 1, function(x) x["mode"] == "login" & x["event"] == "success"))
-    numFail = sum(apply(siteData, 1, function(x) x["mode"] == "login" & x["event"] == "fail"))
+    # Calculate the number of successful logins
+    numSuccess <<- numSuccess + sum(apply(siteData, 1, function(x) x["mode"] == "login" & x["event"] == "success"))
+    
+    # Time storage
+    tmp_timeStart = NULL
+    tmp_timeEnd = NULL
     
     # get a list of all time differences between enter:start and enter:passwordSubmitted events
-    tmp_timeStart = NULL
     listOfLoginTimes = apply(siteData, 1, function(x) {
+      # This is a started login attempt, so we start the timer and also increment the total # of logins
       if (x["mode"] == "enter" & x["event"] == "start") {
-        tmp_timeStart <<- x["time"]
+        
+        # Check if the user "failed" a login
+        if (!is.null(tmp_timeEnd)) {
+          # Add the login time to the failed list
+          loginTimeFail <<- c(loginTimeFail, as.numeric(difftime(tmp_timeEnd, tmp_timeStart, units="secs")))
+          
+          # Set the new time values
+          tmp_timeEnd <<- NULL
+          tmp_timeStart <<- x["time"]
+          
+          # Increment the total number of logins
+          numLogins <<- numLogins + 1
+        } else {
+          # Otherwise the user is just starting a login as normal
+          tmp_timeStart <<- x["time"]
+          numLogins <<- numLogins + 1
+        }
+        
         return (0)
       }
+      # This is a login attempt being completed, so record the time since the last enter:start event
       else if (!is.null(tmp_timeStart) &  x["mode"] == "enter" & x["event"] == "passwordSubmitted") {
-        return(as.numeric(difftime(x["time"], tmp_timeStart, units="secs")))
+        tmp_timeEnd <<- x["time"]
+        return(0)
       }
+      # This is anything else (eg. a login:success event), so we don't care about it and do nothing
       else {
+        # If this is a login:success event add the time to the succeeded list
+        if (!is.null(tmp_timeEnd) & x["mode"] == "login" & x["event"] == "success") {
+          loginTimeSuccess <<- c(loginTimeSuccess, as.numeric(difftime(tmp_timeEnd, tmp_timeStart, units="secs")))
+        }
+        # If this is a login:failure event add the time to the failed list
+        else if (!is.null(tmp_timeEnd) & x["mode"] == "login" & x["event"] == "failure") {
+          loginTimeFail <<- c(loginTimeFail, as.numeric(difftime(tmp_timeEnd, tmp_timeStart, units="secs")))
+        }
+        # If the time is not set, increment the number of logins
+        else if (is.null(tmp_timeEnd)) {
+          numLogins <<- numLogins + 1
+        }
+        
+        # Set the time values to null, no matter what
+        tmp_timeStart <<- NULL
+        tmp_timeEnd <<- NULL
+        
         return(0)
       }
     })
     
-    # calculate the mean
+    # TODO: do the mean calculation once we've actually recorded all the times
     meanLoginTime = mean(listOfLoginTimes)
-  }
   
-}
+  } ###### END OF SITE LOOP
+  
+  # Now we know the total number of logins and the number of successful logins, so the number of failed
+  # is just TOTAL - SUCCESSFUL == FAILED
+  numFailed = numLogins - numSuccess
+  
+  
+  # Set all the values for the user in the final dataframe here...
+  finalFrame
+  
+} ###### END OF USER LOOP
