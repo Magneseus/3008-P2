@@ -106,8 +106,21 @@ for (u in users)
   # is just TOTAL - SUCCESSFUL == FAILED
   numFailed = numLogins - numSuccess
   
-  # Calculate the means of the fail and succeeding login times
-  # TODO: Remove outliers
+  ###### Calculate the means of the fail and succeeding login times #######
+  # calculate the standard deviation
+  sdSuccess = sd(loginTimeSuccess)
+  sdFail = sd(loginTimeFail)
+  
+  # calculate the current mean
+  meanSuccess = mean(loginTimeSuccess)
+  meanFail = mean(loginTimeFail)
+  
+  # remove outliers
+  loginTimeSuccess = loginTimeSuccess[!loginTimeSuccess %in% boxplot.stats(loginTimeSuccess)$out]
+  loginTimeFail = loginTimeFail[!loginTimeFail %in% boxplot.stats(loginTimeFail)$out]
+  
+  
+  # calculate the new means
   meanSuccess = mean(loginTimeSuccess)
   meanFail = mean(loginTimeFail)
   
