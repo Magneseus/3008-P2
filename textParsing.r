@@ -99,9 +99,6 @@ for (u in users)
         return(0)
       }
     })
-    
-    # TODO: do the mean calculation once we've actually recorded all the times
-    meanLoginTime = mean(listOfLoginTimes)
   
   } ###### END OF SITE LOOP
   
@@ -109,8 +106,20 @@ for (u in users)
   # is just TOTAL - SUCCESSFUL == FAILED
   numFailed = numLogins - numSuccess
   
+  # Calculate the means of the fail and succeeding login times
+  # TODO: Remove outliers
+  meanSuccess = mean(loginTimeSuccess)
+  meanFail = mean(loginTimeFail)
+  
   
   # Set all the values for the user in the final dataframe here...
-  finalFrame
+  finalFrame$scheme[finalFrame$user == u] = "textrandom;az-6"
+  
+  finalFrame$totalLogin[finalFrame$user == u] = numLogins
+  finalFrame$successLogin[finalFrame$user == u] = numSuccess
+  finalFrame$failLogin[finalFrame$user == u] = numFailed
+  
+  finalFrame$successTime[finalFrame$user == u] = meanSuccess
+  finalFrame$failTime[finalFrame$user == u] = meanFail
   
 } ###### END OF USER LOOP
