@@ -1,5 +1,5 @@
-# Text csv
-data = read.csv("./data/text_log.csv")
+# Blank csv
+data = read.csv("./data/blank_log.csv")
 
 # Remove rows where there is invalid/no data
 #
@@ -7,7 +7,7 @@ data = read.csv("./data/text_log.csv")
 # are ones that have the scheme listed as "unknown;N/A"
 # and the ones that have the mode listed as "reset"
 # and the ones that have the mode listed as "create"
-data <- data[!(data$scheme == "unknown;N/A" | data$mode == "reset" | data$mode == "create"),]
+data <- data[!(data$scheme == "unknown;N/A" | data$mode == "reset" | data$mode == "create" | data$event == "enterClear" | data$event == "order inputPwd"),]
 
 # Get a list of unique user IDs
 users = unique(data$user)
@@ -73,7 +73,7 @@ for (u in users)
         return (0)
       }
       # This is a login attempt being completed, so record the time since the last enter:start event
-      else if (!is.null(tmp_timeStart) &  x["mode"] == "enter" & x["event"] == "passwordSubmitted") {
+      else if (!is.null(tmp_timeStart) &  x["mode"] == "enter" & (x["event"] == "goodLogin" | x["event"] == "badLogin")) {
         tmp_timeEnd <<- x["time"]
         return(0)
       }
@@ -99,7 +99,7 @@ for (u in users)
         return(0)
       }
     })
-  
+    
   } ###### END OF SITE LOOP
   
   # Now we know the total number of logins and the number of successful logins, so the number of failed
@@ -126,7 +126,7 @@ for (u in users)
   
   
   # Set all the values for the user in the final dataframe here...
-  finalFrame$scheme[finalFrame$user == u] = "textrandom;az-6"
+  finalFrame$scheme[finalFrame$user == u] = "testpasstiles;BlankP"
   
   finalFrame$totalLogin[finalFrame$user == u] = numLogins
   finalFrame$successLogin[finalFrame$user == u] = numSuccess
