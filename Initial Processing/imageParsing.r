@@ -1,5 +1,6 @@
 # Blank csv
 data = read.csv("./data/image_log.csv")
+schemeName = "Image"
 
 # Remove rows where there is invalid/no data
 #
@@ -126,7 +127,7 @@ for (u in users)
   
   
   # Set all the values for the user in the final dataframe here...
-  finalFrame$scheme[finalFrame$user == u] = "testpasstiles;ImageP"
+  finalFrame$scheme[finalFrame$user == u] = schemeName
   
   finalFrame$totalLogin[finalFrame$user == u] = numLogins
   finalFrame$successLogin[finalFrame$user == u] = numSuccess
