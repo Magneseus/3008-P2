@@ -1,5 +1,7 @@
 import java.awt.Robot;
 import java.awt.AWTException;
+import java.util.Date;
+import java.text.*;
 
 Robot robot; // robot just used to simulate enter press
 
@@ -12,12 +14,10 @@ int currSite = 0; // which site (of three) the user is on
 int[] siteOrder; // the randomly assigned order of sites to be tested
 int counter = 0; // where in the site tests they are
 
-// timers
-int[] timers;
-final int CREATE = 0, SUCCESS = 1, FAILURE = 2;
-
 PrintWriter logfile; // the file that is written to to keep track of logs
- 
+DateFormat logDateFormat;
+Date date;
+
 String entry = null; // what the user has entered in the text box
 int showWrong = 0; // timer for displaying the "incorrect" message
 int tries = 0; // how many failures they have incurred this password
@@ -41,6 +41,9 @@ void setup()
     e.printStackTrace();
     exit();
   }
+
+  logDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSS");
+  date = new Date();
 
   // load in the previous logs. Processing can't append to a file.
   String[] oldLogs = loadStrings("logfile.txt");
@@ -85,10 +88,6 @@ void setup()
   passwords = new String[sites.length];
 
   for (int i=0; i<sites.length; i++) passwords[i] = null;
-
-  // initalize the timers
-  timers = new int[3];
-  for (int i=0; i<timers.length; i++) timers[i] = 0;
 }
 
 void draw()
@@ -182,16 +181,7 @@ void mouseClicked()
 {
   // clicking the text box
   if (constrain(mouseX, 160, 460) == mouseX && constrain(mouseY, 60, 80) == mouseY)
-  {
-    // if this is the first click
-    if (entry == null)
-    {
-      // set all the timers
-      timers[CREATE] = millis();
-      timers[SUCCESS] = millis();
-      if (tries == 0) timers[FAILURE] = millis();
-    }
-    
+  {    
     entry = ""; 
   }
   else if (constrain(mouseX, 475, 525) == mouseX && constrain(mouseY, 60, 80) == mouseY) // clicking ok button
@@ -224,7 +214,7 @@ void keyTyped()
           tries = 0;
           
           // log successful create
-          log("create/success", CREATE);
+          log("create/success");
         } else
         {
           // if we're not confirming, try to move to the next random site
@@ -240,7 +230,7 @@ void keyTyped()
           }
 
           // log successful entry
-          log("login/success", SUCCESS);
+          log("login/success");
         }
 
         generatedPassword = null;
@@ -260,7 +250,7 @@ void keyTyped()
             tries = 0;
             
             // log failure
-            log("login/failure", FAILURE);
+            log("login/failure");
           }
         }
       }
@@ -307,9 +297,11 @@ boolean verifyPassword(String attempt)
 
 // writes a log to the log file, with the correct time
 // also resets the timer when logged
-void log(String text, int whichTimer)
+void log(String text)
 {
-  int diff = millis() - timers[whichTimer];
-  timers[whichTimer] = millis();
-  logfile.print("LOG: " + username + "," + text + "," + diff + "ms;");
+  //int diff = millis() - timers[whichTimer];
+  //timers[whichTimer] = millis();
+  date = new Date();
+  String dateString = logDateFormat.format(date);
+  logfile.print("LOG: " + username + "," + text + "," + dateString + ";");
 }
