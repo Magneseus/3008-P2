@@ -21,7 +21,7 @@ Date date;
 String entry = null; // what the user has entered in the text box
 int showWrong = 0; // timer for displaying the "incorrect" message
 int tries = 0; // how many failures they have incurred this password
- 
+
 boolean complete = false; // have they finished the program
 
 String[] generatedPassword = null; // the newest generated password
@@ -54,14 +54,14 @@ void setup()
 
   // load all possible words
   wordsPossible = loadStrings("SEUSS_WORDS.txt");
-  
+
   // load and set the font to be used in UI
   font = loadFont("ArialMT-48.vlw");
   textFont(font, 20);
 
   // generate a random username
   username = "user" + int(random(1000));
-  
+
   // assign names for each site
   sites = new String[3];
   sites[0] = "Email";
@@ -172,7 +172,7 @@ void exit()
   // finish writing the file and close file
   logfile.flush();
   logfile.close();
-  
+
   // actually close the program
   super.exit();
 }
@@ -182,9 +182,8 @@ void mouseClicked()
   // clicking the text box
   if (constrain(mouseX, 160, 460) == mouseX && constrain(mouseY, 60, 80) == mouseY)
   {    
-    entry = ""; 
-  }
-  else if (constrain(mouseX, 475, 525) == mouseX && constrain(mouseY, 60, 80) == mouseY) // clicking ok button
+    entry = "";
+  } else if (constrain(mouseX, 475, 525) == mouseX && constrain(mouseY, 60, 80) == mouseY) // clicking ok button
   {
     // simulate enter being hit
     robot.keyPress(ENTER);
@@ -203,16 +202,16 @@ void keyTyped()
       if (verifyPassword(entry))
       {
         //println(currSite + " " + entry);
-        
+
         // if you successfully confirm a password
         if (confirming)
         {
           // move to the next site
           currSite++;
-          
+
           // reset the tries counter
           tries = 0;
-          
+
           // log successful create
           log("create/success");
         } else
@@ -237,10 +236,10 @@ void keyTyped()
       } else
       {
         // entry fail
-        
+
         // set timer to ~2 seconds
         showWrong = 120;
-        
+
         // if you fail three attempts to enter pass, log a failure
         if (!confirming) 
         {
@@ -248,7 +247,18 @@ void keyTyped()
           if (tries == 3)
           {
             tries = 0;
-            
+
+            counter++;
+            if (counter < siteOrder.length)
+            {
+              // set the current site to the random site
+              currSite = siteOrder[counter];
+            } else
+            {
+              // if we've traversed all of the sites, we're done
+              complete = true;
+            }
+
             // log failure
             log("login/failure");
           }
