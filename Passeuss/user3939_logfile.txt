@@ -1,0 +1,1 @@
+LOG: user3939,start,2017/04/07 15:47:32:212;LOG: user3939,create/success,2017/04/07 15:47:39:598;LOG: user3939,create/success,2017/04/07 15:47:52:665;LOG: user3939,create/success,2017/04/07 15:48:06:515;LOG: user3939,login/success,2017/04/07 15:48:13:816;LOG: user3939,login/success,2017/04/07 15:48:18:799;LOG: user3939,login/failure,2017/04/07 15:48:50:750;
