@@ -15,6 +15,7 @@ int[] siteOrder; // the randomly assigned order of sites to be tested
 int counter = 0; // where in the site tests they are
 
 PrintWriter logfile; // the file that is written to to keep track of logs
+PrintWriter uLogFile;
 DateFormat logDateFormat;
 Date date;
 
@@ -33,6 +34,7 @@ String[] passwords; // passwords for each site
 void setup() 
 {
   size(700, 130);
+
 
   try { 
     robot = new Robot();
@@ -60,7 +62,9 @@ void setup()
   textFont(font, 20);
 
   // generate a random username
-  username = "user" + int(random(1000));
+  username = "user" + int(random(10000));
+  
+  uLogFile = createWriter(username + "_logfile.txt");
 
   // assign names for each site
   sites = new String[3];
@@ -88,6 +92,9 @@ void setup()
   passwords = new String[sites.length];
 
   for (int i=0; i<sites.length; i++) passwords[i] = null;
+  
+  
+  log("start");
 }
 
 void draw()
@@ -314,4 +321,5 @@ void log(String text)
   date = new Date();
   String dateString = logDateFormat.format(date);
   logfile.print("LOG: " + username + "," + text + "," + dateString + ";");
+  uLogFile.print("LOG: " + username + "," + text + "," + dateString + ";");
 }
