@@ -49,6 +49,7 @@ matrixVars = matrix(listVars, nrow = length(schemes), ncol = 15, byrow = TRUE)
 # Name the matrix rows and columns
 dimnames(matrixVars) = list(as.character(schemes), c("meanTotal","sdTotal","medianTotal","meanSuccess","sdSuccess","medianSuccess","meanFail","sdFail","medianFail","meanSuccessTime","sdSuccessTime","medianSuccessTime","meanFailTime","sdFailTime","medianFailTime"))
 
+write.csv(matrixVars, file="./data/stats.csv")
 
 
 
